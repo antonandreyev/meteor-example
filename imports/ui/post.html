@@ -1,0 +1,7 @@
+<template name="post">
+  <h2>{{title}} {{#if currentUser}} | <button class="delete">&times;</button> {{/if}}</h2>
+  <div>{{{text}}}</div>
+  <p>{{formatDate date}} / {{username}}</p>
+  <p><a href="/post/{{_id}}">Подробнее</a></p>
+</template>
+

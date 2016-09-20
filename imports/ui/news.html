@@ -1,0 +1,24 @@
+<template name="news">
+  <div class="container">
+    <header>
+      <h1>Новости</h1>
+      {{> loginButtons}}
+    </header>
+
+    <div id="news">
+      {{#each posts}}
+        {{> post}}
+      {{/each}}
+    </div>
+    
+    {{#if currentUser}}
+    <hr/>
+    <form class="add-news">
+        <input type="text" name="title" placeholder="Заголовок"/>
+        <textarea name="text" placeholder="Текст новости" ></textarea>
+        <input type="submit" value="Добавить"/>
+    </form>
+    {{/if}}
+  </div>
+
+</template>  
