@@ -154,7 +154,7 @@ ES2015. Так, создателяи фреймворка предлагаетс
 следующим образом:
 
 \begin{alltt}
-import { Mongo } from 'meteor/mongo';
+import \{ Mongo \} from 'meteor/mongo';
 \end{alltt}
 
 Документы БД в Meteor представлены, как объекты JavaScript.
@@ -166,13 +166,13 @@ var coll = new Mongo.Collection('collection\_name');
 // получение всех документов
 coll.find();
 // запрос по документам
-coll.find({someProperty: someVal});
+coll.find(\{someProperty: someVal\});
 // получение одного найденного документа
-coll.findOne({someProperty: someVal});
+coll.findOne(\{someProperty: someVal\});
 // вставка документа
-coll.insert({someProperty: someVal});
+coll.insert(\{someProperty: someVal\});
 // удаление всех удовлетворяющих элементов
-coll.remove({someProperty: someVal});
+coll.remove(\{someProperty: someVal\});
 \end{alltt}
 
 Подробнее см. общий API MongoDB. Заметим одну особенность Meteor:
@@ -192,9 +192,9 @@ aldeed:simple-schema.
 
 Определение схемы для коллекции осуществляется следующим образом:
 \begin{alltt}
-	import { SimpleSchema } from 'meteor/aldeed:simple-schema';
+	import \{ SimpleSchema \} from 'meteor/aldeed:simple-schema';
 	
-	coll.schema = new SimpleSchema({...});
+	coll.schema = new SimpleSchema(\{...\});
 \end{alltt}
 
 Включение автоматической валидации документов при операциях
@@ -213,18 +213,18 @@ insert и update можно осуществить следующим образ
 Схема будет следующая:
 
 \begin{alltt}
-News.schema = new SimpleSchema({
+News.schema = new SimpleSchema(\{
 	// идентификатор новости
-    \_id: { type: String, regEx: SimpleSchema.RegEx.Id },
-    ?/ заголовок новости
-    title: { type: String },
+    \_id: \{ type: String, regEx: SimpleSchema.RegEx.Id \},
+    // заголовок новости
+    title: \{ type: String \},
     // основной новостной текст новости (в виде HTML)
-    text: { type: String },
+    text: \{ type: String \},
     // дана создания новости
-    date: { type: Date },
+    date: \{ type: Date \},
     // имя пользователя, который создал новость
-    username : { type: String }
-});
+    username : \{ type: String \}
+\});
 \end{alltt}
 
 Чтобы сделать коллекцию доступной в других модулях
@@ -235,14 +235,68 @@ export const News = new Mongo.Collection('News');
 \end{alltt}
 
 \subsection{Роутинг}
-\dots
+Meteor ориентирован на создание одностраничных приложений, для которых
+не нужен роутинг. Однако, для поддержки некоторых возможностей обработка
+адресной строки и перенаправления между страницами все таки необходимо.
+В нашем приложении предполагается существование отдельной страницы
+для каждой новости и уникального адреса для них (чтобы доступ к
+отдельной новости можно было бы легко получить извне, например
+для индексации в поисковых системах).
 
+Одним из доступных роутеров (которые распространяются в виде пакетов)
+является ``kadira:flow-router''.
 
+Для определения маршрута, который будет обрабатываться приложением
+(на стороне клиента!), можно использовать следующую конструкцию:
 
-\subsection{Шаблоны представлений}
-\dots
+\begin{alltt}
+import \{ FlowRouter \} from 'meteor/kadira:flow-router';
+
+FlowRouter.route('/some/path/:someVariable', \{
+    name: 'SomeName.show',
+    action(params, queryParams) \{
+        // какие-либо действия
+        console.log("some log");
+    \}
+\});
+\end{alltt}
+
+В данном случае, при совпадении запрашиваемого адреса с
+определенным адресом будут выполнены действия, определенные
+в методе ``action''. Параметры адресного запроса
+указываются начиная с двоеточия. Объект ``params''
+будет содержать имена и значения определенных параметров 
+адресной строки, а объект ``queryParams'' ---
+параметров GET запроса (если есть).
+
+Для нашего приложения потребуются два маршрута.
+Маршрут для корня приложения (адрес '/') и маршрут
+для отдельной новости (адрес '/post/:\_id'). 
+
+\begin{alltt}
+FlowRouter.route('/post/:\_id', \{
+    name: 'Post.show',
+    action() \{  
+        ...
+    \}
+\});
+
+FlowRouter.route('/', \{
+    name: 'main.show',
+    action() \{  
+        ...
+    \}
+\});
+\end{alltt}
+
+Предполагается, что файл с описанием маршрутов будет
+размещен в ``imports/startup/client'', а модуль, описываемый
+файлом, будет импортирован ``client/main.js''.
 
 \subsection{Аутентификация и авторизация}
+\dots
+
+\subsection{Шаблоны представлений}
 \dots
 
 \subsection{Дальнейшая работа}
