@@ -370,6 +370,14 @@ FlowRouter.route('/', \{
 ``layout'', а в блоке ``main'' этого шабона будет 
 рендериться шаблон, подходящий к маршруту.
 
+Блок в шаблоне определяется следующим образом:
+\begin{alltt}
+\{\{> Template.dynamic template=main\}\}
+\end{alltt}
+
+Здесь ``Template'' импортируется из 'meteor/templating'
+в JS-части шаблона.
+
 Расширяющие шаблоны следующие: 
 \begin{itemize}
 	\item post описывает одну новость;
@@ -383,8 +391,57 @@ FlowRouter.route('/', \{
 компонент post в рассматриваемом новостном приложении.
 
 \subsection{Формы и события}
+Формы определяются в HTML-файлах шаблонов, а обработка форм
+осуществляется по событиям, действия к которым привязываются
+в стиле JQuery.
 
-\dots
+В нашем новостном приложении необходима форма для добавления новости,
+которую мы расположим на странице новостей (шаблон news). Доступ
+к этой форме будем предоставлять только авторизованным пользователям: 
+
+\begin{alltt}
+\{\{#if currentUser\}\}
+  <hr/>
+  <form class="add-news">
+    <input type="text" name="title" placeholder="Заголовок"/>
+    <textarea name="text" placeholder="Текст новости" ></textarea>
+    <input type="submit" value="Добавить"/>
+  </form>
+\{\{/if\}\}
+\end{alltt}
+
+По нажатию кнопки ``Добавить'' возникнет событие ``submit''
+при обработке которого мы должны добавить новую новость.
+Обработчик для события мы назначем в ``/imports/ui/news.js'':
+
+\begin{alltt}
+Template.news.events(\{
+    'submit .add-news'(event) \{
+        // предотвращаем обработку формы по умолчанию 
+        // (т.к. работаем на стороне клиента)
+        event.preventDefault();
+		
+        // получаем данные из формы
+        const target = event.target;
+        const title = target.title.value;
+        const text = target.text.value;
+		
+        // вставляем новый документ в коллекцию
+        News.insert(\{
+            title: title,
+            text: text,
+            date: new Date(), 
+            username: Meteor.user().username
+        \}); 
+		
+        // очищаем форму для добавления новых в будущем
+        target.title.value = '';
+        target.text.value = '';
+    \}
+\});
+\end{alltt}
+
+Аналогичным образом можно обрабатывать другие HTML-события.
 
 \subsection{Прочее}
 Инициализацию приложения можно производить с помощью файла
